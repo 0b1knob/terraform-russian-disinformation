@@ -14,9 +14,9 @@ variable "targets" {
     "https://anti-maidan.com/",
     "https://lenta.ru/",
     "https://ria.ru/",
-    "https://ria.ru/",
     "https://www.rbc.ru/",
-    "https://www.rt.com/ http://kremlin.ru/",
+    "https://www.rt.com/",
+    "http://kremlin.ru/",
     "http://en.kremlin.ru/",
     "https://smotrim.ru/",
     "https://tass.ru/",
@@ -73,7 +73,6 @@ variable "targets" {
     "https://riafan.ru/",
     "https://www.mk.ru/",
     "https://api.sberbank.ru/",
-    "https://api.sberbank.ru/",
     "https://www.vedomosti.ru/",
     "https://sputnik.by/"
   ]
@@ -87,9 +86,9 @@ resource "docker_image" "bombardier" {
 }
 
 resource "docker_container" "bombardier" {
-  for_each = toset(var.targets)
+  count = length(var.targets)
   image   = docker_image.bombardier.latest
-  name    = each.value
+  name    = format("bombardier-%02d", count.index + 1)
   restart = "always"
-  command = ["-c", "10", "-d", "3600s", "-k", each.value]
+  command = ["-c", "10", "-d", "3600s", "-k", var.targets[count.index]]
 }
